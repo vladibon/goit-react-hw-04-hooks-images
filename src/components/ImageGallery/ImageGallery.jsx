@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import Loader from 'react-loader-spinner';
 import { toast } from 'react-toastify';
 import { ImageGalleryList } from '../ImageGalleryList';
 import { Button } from '../Button';
+import { Loader } from '../Loader';
 import { fetchImages } from '../../api/pixabay';
 
 const Status = {
@@ -25,17 +25,14 @@ class ImageGallery extends Component {
     status: Status.IDLE,
   };
 
-  getSnapshotBeforeUpdate(prevProps, prevState) {
+  getSnapshotBeforeUpdate() {
     return window.scrollY;
   }
 
   async componentDidUpdate(prevProps, prevState, snapshot) {
     const { query, page } = this.props;
-    const isSameQuery = query === prevProps.query;
-    const isSamePage = page === prevProps.page;
 
-    if (isSameQuery && isSamePage) return;
-
+    if (query === prevProps.query && page === prevProps.page) return;
     this.switchStatus(Status.PENDING);
 
     try {
@@ -49,8 +46,7 @@ class ImageGallery extends Component {
         );
       }
 
-      if (!isSameQuery) this.resetImages();
-
+      if (page === 1) this.resetImages();
       this.addImages(newImages);
       this.switchStatus(Status.RESOLVED);
 
@@ -77,7 +73,7 @@ class ImageGallery extends Component {
 
   scrollBottom(snapshot) {
     window.scrollTo({
-      top: window.outerHeight + snapshot,
+      top: window.innerHeight + snapshot - 150,
       behavior: 'smooth',
     });
   }
@@ -86,23 +82,13 @@ class ImageGallery extends Component {
     const { incrementPage } = this.props;
     const { images, status } = this.state;
 
-    console.log(status);
+    console.dir(document);
 
     return (
       <>
         <ImageGalleryList images={images} />
-
-        {status === Status.PENDING && (
-          <Loader
-            type='Puff'
-            color='#00BFFF'
-            height={100}
-            width={100}
-            timeout={3000}
-          />
-        )}
-
         {status === Status.RESOLVED && <Button onClick={incrementPage} />}
+        {status === Status.PENDING && <Loader />}
       </>
     );
   }
