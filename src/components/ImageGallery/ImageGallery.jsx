@@ -33,6 +33,7 @@ class ImageGallery extends Component {
     const { query, page } = this.props;
 
     if (query === prevProps.query && page === prevProps.page) return;
+
     this.switchStatus(Status.PENDING);
 
     try {
@@ -81,8 +82,6 @@ class ImageGallery extends Component {
   render() {
     const { incrementPage } = this.props;
     const { images, status } = this.state;
-
-    console.dir(document);
 
     return (
       <>
