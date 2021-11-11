@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import Loader from 'react-loader-spinner';
 import { toast } from 'react-toastify';
 import { ImageGalleryList } from '../ImageGalleryList';
 import { Button } from '../Button';
@@ -92,9 +93,13 @@ class ImageGallery extends Component {
         <ImageGalleryList images={images} />
 
         {status === Status.PENDING && (
-          <h2 style={{ zIndex: 1200, position: 'fixed', top: 0, left: 0 }}>
-            Loading
-          </h2>
+          <Loader
+            type='Puff'
+            color='#00BFFF'
+            height={100}
+            width={100}
+            timeout={3000}
+          />
         )}
 
         {status === Status.RESOLVED && <Button onClick={incrementPage} />}
