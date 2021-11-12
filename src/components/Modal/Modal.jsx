@@ -13,7 +13,6 @@ class Modal extends Component {
   }
 
   handleKeyDown = ({ code }) => {
-    console.log(code);
     code === 'Escape' && this.props.toggleModal();
     code === 'ArrowRight' && this.props.setNextImage();
     code === 'ArrowLeft' && this.props.setPrevImage();

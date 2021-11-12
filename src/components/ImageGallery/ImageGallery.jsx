@@ -39,9 +39,9 @@ class ImageGallery extends Component {
 
   setPrevImage = () => {
     this.setState(({ imageIdx, imagesCount }) => {
-      const prevIdx = imageIdx - 1;
+      const nextIdx = imageIdx - 1;
 
-      return { imageIdx: prevIdx >= 0 ? prevIdx : imagesCount - 1 };
+      return { imageIdx: nextIdx >= 0 ? nextIdx : imagesCount - 1 };
     });
   };
 
