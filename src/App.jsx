@@ -1,9 +1,9 @@
 import { Component } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
 import { Searchbar } from './components/Searchbar';
 import { ImageGallery } from './components/ImageGallery';
 import { Button } from './components/Button';
 import { Loader } from './components/Loader';
+import { ReactComponent as PixabayLogo } from './images/pixabay-logo.svg';
 import { fetchImages } from './api/pixabay';
 
 const Status = {
@@ -18,12 +18,9 @@ class App extends Component {
     query: '',
     page: 1,
     images: [],
+    message: '',
     status: Status.IDLE,
   };
-
-  componentDidMount() {
-    this.setState({ query: 'top' });
-  }
 
   getSnapshotBeforeUpdate() {
     return window.scrollY;
@@ -58,7 +55,7 @@ class App extends Component {
       if (page > 1) scrollBottom(snapshot);
     } catch ({ message }) {
       this.switchStatus(Status.REJECTED);
-      toast.error(message);
+      this.setState({ message });
     }
   }
 
@@ -85,7 +82,7 @@ class App extends Component {
   };
 
   render() {
-    const { images, status } = this.state;
+    const { images, message, status } = this.state;
 
     return (
       <div className='App'>
@@ -94,8 +91,23 @@ class App extends Component {
 
         {status === Status.PENDING && <Loader />}
         {status === Status.RESOLVED && <Button onClick={this.incrementPage} />}
-
-        <ToastContainer autoClose={3000} />
+        {status === Status.REJECTED && (
+          <div>
+            <h2>{message}</h2>
+          </div>
+        )}
+        {status === Status.IDLE && (
+          <div>
+            <a
+              href='https://pixabay.com/'
+              target='_blank'
+              rel='nofollow noreferrer'
+              aria-label='pixabay'
+            >
+              <PixabayLogo width='400' />
+            </a>
+          </div>
+        )}
       </div>
     );
   }

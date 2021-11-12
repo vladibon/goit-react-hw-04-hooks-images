@@ -35,15 +35,17 @@ img {
   grid-template-columns: 1fr;
   grid-gap: 16px;
   padding-bottom: 66px;
+  text-align: center;
 }
 
 /*
  * Стили компонента Searchbar
  */
 .Searchbar {
+  position: sticky;
   top: 0;
   left: 0;
-  position: sticky;
+  z-index: 1100;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -155,6 +157,7 @@ img {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 1200;
   width: 100vw;
   height: 100vh;
   display: flex;

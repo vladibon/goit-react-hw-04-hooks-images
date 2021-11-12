@@ -14,13 +14,27 @@ class ImageGallery extends Component {
   };
 
   state = {
-    imageIdx: null,
     imagesCount: null,
+    imageIdx: null,
     showModal: false,
   };
 
-  handleClick = ({ imageIdx, imagesCount }) => {
-    this.setState({ imageIdx, imagesCount });
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      nextProps.images !== this.props.images ||
+      nextState.imageIdx !== this.state.imageIdx ||
+      nextState.showModal !== this.state.showModal
+    );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { images } = this.props;
+
+    this.setState({ imagesCount: images.length });
+  }
+
+  handleClick = imageIdx => {
+    this.setState({ imageIdx });
     this.toggleModal();
   };
 
@@ -56,9 +70,7 @@ class ImageGallery extends Component {
               key={id}
               webformatURL={webformatURL}
               tags={tags}
-              onClick={() =>
-                this.handleClick({ imageIdx, imagesCount: images.length })
-              }
+              onClick={() => this.handleClick(imageIdx)}
             />
           ))}
         </ul>
