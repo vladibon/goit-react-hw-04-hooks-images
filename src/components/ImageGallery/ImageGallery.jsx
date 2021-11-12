@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import { ImageGalleryItem } from '../ImageGalleryItem';
 import { Modal } from '../Modal';
 
 class ImageGallery extends Component {
@@ -7,9 +8,7 @@ class ImageGallery extends Component {
     images: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,
-        webformatURL: PropTypes.string.isRequired,
-        largeImageURL: PropTypes.string,
-        tags: PropTypes.string,
+        largeImageURL: PropTypes.string.isRequired,
       }).isRequired,
     ).isRequired,
   };
@@ -53,19 +52,14 @@ class ImageGallery extends Component {
       <>
         <ul className='ImageGallery'>
           {images.map(({ id, webformatURL, tags }, imageIdx) => (
-            <li
-              className='ImageGalleryItem'
+            <ImageGalleryItem
               key={id}
+              webformatURL={webformatURL}
+              tags={tags}
               onClick={() =>
                 this.handleClick({ imageIdx, imagesCount: images.length })
               }
-            >
-              <img
-                className='ImageGalleryItem-image'
-                src={webformatURL}
-                alt={tags}
-              />
-            </li>
+            />
           ))}
         </ul>
 
