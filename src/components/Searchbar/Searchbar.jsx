@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ImSearch } from 'react-icons/im';
-import { toast } from 'react-toastify';
 
 class Searchbar extends Component {
   static propTypes = {
@@ -25,9 +24,7 @@ class Searchbar extends Component {
 
     const { query } = this.state;
 
-    if (!query.trim()) {
-      return toast.warn('Please enter your search query and try again!');
-    }
+    if (!query.trim()) return;
 
     this.props.onSubmit(query.toLowerCase());
 

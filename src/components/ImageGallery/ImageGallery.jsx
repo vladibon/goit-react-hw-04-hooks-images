@@ -1,93 +1,86 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { toast } from 'react-toastify';
-import { ImageGalleryList } from '../ImageGalleryList';
-import { Button } from '../Button';
-import { Loader } from '../Loader';
-import { fetchImages } from '../../api/pixabay';
-
-const Status = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  REJECTED: 'rejected',
-  RESOLVED: 'resolved',
-};
+import { Modal } from '../Modal';
 
 class ImageGallery extends Component {
   static propTypes = {
-    query: PropTypes.string,
-    page: PropTypes.number.isRequired,
-    incrementPage: PropTypes.func.isRequired,
+    images: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        webformatURL: PropTypes.string.isRequired,
+        largeImageURL: PropTypes.string,
+        tags: PropTypes.string,
+      }).isRequired,
+    ).isRequired,
   };
 
   state = {
-    images: [],
-    status: Status.IDLE,
+    imageIdx: null,
+    imagesCount: null,
+    showModal: false,
   };
 
-  getSnapshotBeforeUpdate() {
-    return window.scrollY;
-  }
-
-  async componentDidUpdate(prevProps, prevState, snapshot) {
-    const { query, page } = this.props;
-
-    if (query === prevProps.query && page === prevProps.page) return;
-
-    this.switchStatus(Status.PENDING);
-
-    try {
-      const { hits: newImages } = await fetchImages({ query, page });
-
-      if (!newImages.length) {
-        this.switchStatus(Status.IDLE);
-
-        return toast.warn(
-          'Sorry, there are no images matching your search query!',
-        );
-      }
-
-      if (page === 1) this.resetImages();
-      this.addImages(newImages);
-      this.switchStatus(Status.RESOLVED);
-
-      if (page > 1) this.scrollBottom(snapshot);
-    } catch ({ message }) {
-      this.switchStatus(Status.REJECTED);
-      toast.error(message);
-    }
-  }
-
-  resetImages = () => {
-    this.setState({ images: [] });
+  handleClick = ({ imageIdx, imagesCount }) => {
+    this.setState({ imageIdx, imagesCount });
+    this.toggleModal();
   };
 
-  addImages = newImages => {
-    this.setState(({ images }) => ({
-      images: [...images, ...newImages],
-    }));
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  switchStatus = newStatus => {
-    this.setState({ status: newStatus });
-  };
+  setNextImage = () => {
+    this.setState(({ imageIdx, imagesCount }) => {
+      const nextIdx = imageIdx + 1;
 
-  scrollBottom(snapshot) {
-    window.scrollTo({
-      top: window.innerHeight + snapshot - 150,
-      behavior: 'smooth',
+      return { imageIdx: nextIdx < imagesCount ? nextIdx : 0 };
     });
-  }
+  };
+
+  setPrevImage = () => {
+    this.setState(({ imageIdx, imagesCount }) => {
+      const prevIdx = imageIdx - 1;
+
+      return { imageIdx: prevIdx >= 0 ? prevIdx : imagesCount - 1 };
+    });
+  };
 
   render() {
-    const { incrementPage } = this.props;
-    const { images, status } = this.state;
+    const { images } = this.props;
+    const { imageIdx, showModal } = this.state;
 
     return (
       <>
-        <ImageGalleryList images={images} />
-        {status === Status.RESOLVED && <Button onClick={incrementPage} />}
-        {status === Status.PENDING && <Loader />}
+        <ul className='ImageGallery'>
+          {images.map(({ id, webformatURL, tags }, imageIdx) => (
+            <li
+              className='ImageGalleryItem'
+              key={id}
+              onClick={() =>
+                this.handleClick({ imageIdx, imagesCount: images.length })
+              }
+            >
+              <img
+                className='ImageGalleryItem-image'
+                src={webformatURL}
+                alt={tags}
+              />
+            </li>
+          ))}
+        </ul>
+
+        {showModal && (
+          <Modal
+            toggleModal={this.toggleModal}
+            setNextImage={this.setNextImage}
+            setPrevImage={this.setPrevImage}
+          >
+            <img
+              src={images[imageIdx].largeImageURL}
+              alt={images[imageIdx].tags}
+            />
+          </Modal>
+        )}
       </>
     );
   }
