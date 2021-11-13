@@ -13,13 +13,13 @@ class Modal extends Component {
   };
 
   componentDidMount() {
-    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', this.handleKeyDown);
+    document.body.style.overflow = 'hidden';
   }
 
   componentWillUnmount() {
-    document.body.style.overflow = 'unset';
     window.removeEventListener('keydown', this.handleKeyDown);
+    document.body.style.overflow = 'unset';
   }
 
   handleKeyDown = ({ code }) => {
