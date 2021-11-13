@@ -7,7 +7,7 @@ const modalRoot = document.querySelector('#modal-root');
 
 class Modal extends Component {
   static propTypes = {
-    toggleModal: PropTypes.func.isRequired,
+    closeModal: PropTypes.func.isRequired,
     setNextImage: PropTypes.func.isRequired,
     setPrevImage: PropTypes.func.isRequired,
   };
@@ -23,13 +23,13 @@ class Modal extends Component {
   }
 
   handleKeyDown = ({ code }) => {
-    code === 'Escape' && this.props.toggleModal();
+    code === 'Escape' && this.props.closeModal();
     code === 'ArrowRight' && this.props.setNextImage();
     code === 'ArrowLeft' && this.props.setPrevImage();
   };
 
   handleOverlayClick = ({ currentTarget, target }) => {
-    currentTarget === target && this.props.toggleModal();
+    currentTarget === target && this.props.closeModal();
   };
 
   render() {

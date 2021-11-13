@@ -15,7 +15,6 @@ class ImageGallery extends Component {
   };
 
   state = {
-    imagesCount: null,
     imageIdx: null,
     showModal: false,
   };
@@ -28,34 +27,27 @@ class ImageGallery extends Component {
     );
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { images } = this.props;
-
-    if (images === prevProps.images) return;
-
-    this.setState({ imagesCount: images.length });
-  }
-
   handleClick = imageIdx => {
-    this.setState({ imageIdx });
-    this.toggleModal();
+    this.setState({ imageIdx, showModal: true });
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  closeModal = () => {
+    this.setState({ showModal: false });
   };
 
   setNextImage = () => {
-    this.setState(({ imageIdx, imagesCount }) => {
+    this.setState(({ imageIdx }) => {
       const nextIdx = imageIdx + 1;
+      const imagesCount = this.props.images.length;
 
       return { imageIdx: nextIdx < imagesCount ? nextIdx : 0 };
     });
   };
 
   setPrevImage = () => {
-    this.setState(({ imageIdx, imagesCount }) => {
+    this.setState(({ imageIdx }) => {
       const nextIdx = imageIdx - 1;
+      const imagesCount = this.props.images.length;
 
       return { imageIdx: nextIdx >= 0 ? nextIdx : imagesCount - 1 };
     });
@@ -80,7 +72,7 @@ class ImageGallery extends Component {
 
         {showModal && (
           <Modal
-            toggleModal={this.toggleModal}
+            closeModal={this.closeModal}
             setNextImage={this.setNextImage}
             setPrevImage={this.setPrevImage}
           >
