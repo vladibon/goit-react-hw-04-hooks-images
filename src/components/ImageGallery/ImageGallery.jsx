@@ -1,7 +1,8 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ImageGalleryItem } from '../ImageGalleryItem';
-import { Modal } from '../Modal';
+import { ImageGalleryItem } from 'components/ImageGalleryItem';
+import { Modal } from 'components/Modal';
+import s from './ImageGallery.module.css';
 
 class ImageGallery extends Component {
   static propTypes = {
@@ -29,6 +30,8 @@ class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { images } = this.props;
+
+    if (images === prevProps.images) return;
 
     this.setState({ imagesCount: images.length });
   }
@@ -64,7 +67,7 @@ class ImageGallery extends Component {
 
     return (
       <>
-        <ul className='ImageGallery'>
+        <ul className={s.ImageGallery}>
           {images.map(({ id, webformatURL, tags }, imageIdx) => (
             <ImageGalleryItem
               key={id}

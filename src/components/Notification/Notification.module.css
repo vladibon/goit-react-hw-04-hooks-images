@@ -1,0 +1,19 @@
+.container {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px;
+  min-height: 72px;
+  z-index: 1200;
+  border-radius: 4px;
+  background-color: var(--notification-bg-color);
+  cursor: pointer;
+}
+
+.message {
+  padding: 12px 24px;
+  font-size: 20px;
+  color: var(--bg-color);
+}

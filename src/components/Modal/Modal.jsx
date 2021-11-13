@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import s from './Modal.module.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
@@ -12,10 +13,12 @@ class Modal extends Component {
   };
 
   componentDidMount() {
+    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
+    document.body.style.overflow = 'unset';
     window.removeEventListener('keydown', this.handleKeyDown);
   }
 
@@ -33,8 +36,8 @@ class Modal extends Component {
     const { children } = this.props;
 
     return createPortal(
-      <div className='Overlay' onClick={this.handleOverlayClick}>
-        <div className='Modal'>{children}</div>
+      <div className={s.Overlay} onClick={this.handleOverlayClick}>
+        <div className={s.Modal}>{children}</div>
       </div>,
       modalRoot,
     );

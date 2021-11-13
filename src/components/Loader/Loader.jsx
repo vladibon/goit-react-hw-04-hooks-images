@@ -6,8 +6,8 @@ const Loader = () => (
     <Spinner
       type='ThreeDots'
       color='#3d8679'
-      height={120}
-      width={120}
+      height={110}
+      width={110}
       timeout={3000}
     />
   </div>

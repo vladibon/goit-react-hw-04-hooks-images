@@ -1,12 +1,17 @@
-.loader {
+.Overlay {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 1200;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   background-color: var(--overlay-bg-color);
-  z-index: 1200;
+}
+
+.Modal {
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 24px);
 }
