@@ -10,9 +10,7 @@ axios.defaults.params = {
 };
 
 const fetchImages = async ({ query: q, page }) => {
-  const { data } = await axios(
-    `?${new URLSearchParams({ q, page }).toString()}`,
-  );
+  const { data } = await axios('', { params: { q, page } });
 
   return data;
 };
