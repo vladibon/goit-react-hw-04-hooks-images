@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Searchbar } from 'components/Searchbar';
 import { ImageGallery } from 'components/ImageGallery';
 import { Loader } from 'components/Loader';
@@ -16,94 +16,97 @@ const Status = {
   REJECTED: 'rejected',
 };
 
-class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    images: [],
-    message: '',
-    status: Status.IDLE,
-  };
+function App() {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(Status.IDLE);
 
-  getSnapshotBeforeUpdate() {
-    return window.scrollY;
-  }
-
-  async componentDidUpdate(prevProps, prevState, snapshot) {
-    const { query, page } = this.state;
-
-    if (query === prevState.query && page === prevState.page) return;
-
-    try {
-      const { totalHits, hits: newImages } = await fetchImages({ query, page });
-
-      this.checkErrors(totalHits, newImages);
-      this.addImages(newImages);
-
-      if (page > 1) this.scrollBottom(snapshot);
-    } catch ({ message }) {
-      this.setState({ message, status: Status.REJECTED });
-    }
-  }
-
-  checkErrors(totalHits, newImages) {
+  const checkErrors = (totalHits, hits) => {
     if (!totalHits) {
       throw new Error('Sorry, there are no images matching your search query.');
     }
 
-    if (!newImages.length) {
+    if (!hits.length) {
       throw new Error(
         `We're sorry, but you've reached the end of the search result.`,
       );
     }
-  }
+  };
 
-  scrollBottom(snapshot) {
+  const scrollBottom = () => {
     window.scrollTo({
-      top: window.innerHeight + snapshot - 150,
+      top: window.innerHeight + window.scrollY - 150,
       behavior: 'smooth',
     });
-  }
-
-  addImages = newImages => {
-    this.setState(({ images }) => ({
-      images: [...images, ...newImages],
-      status: Status.RESOLVED,
-    }));
   };
 
-  handleSubmit = query => {
-    this.setState({ query, page: 1, images: [], status: Status.PENDING });
+  useEffect(() => {
+    const fetchData = async () => {
+      setStatus(Status.PENDING);
+
+      try {
+        const { totalHits, hits } = await fetchImages(query, page);
+
+        page === 1
+          ? setImages(hits)
+          : setImages(images => [...images, ...hits]);
+
+        checkErrors(totalHits, hits);
+        setStatus(Status.RESOLVED);
+
+        if (page > 1) scrollBottom();
+      } catch ({ message }) {
+        setMessage(message);
+        setStatus(Status.REJECTED);
+      }
+    };
+
+    if (!query) return;
+
+    fetchData();
+  }, [query, page]);
+
+  const scrollTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
-  handleNextLoad = () => {
-    this.setState(({ page }) => ({ page: page + 1, status: Status.PENDING }));
+  const handleSubmit = newQuery => {
+    if (newQuery === query) return scrollTop();
+
+    setQuery(newQuery);
+    setPage(1);
   };
 
-  render() {
-    const { images, message, status } = this.state;
+  const handleNextLoad = () => {
+    setPage(page => page + 1);
+  };
 
-    return (
-      <div className={s.App}>
-        <Searchbar onSubmit={this.handleSubmit} />
+  return (
+    <div className={s.App}>
+      <Searchbar onSubmit={handleSubmit} />
+
+      {!images.length ? (
+        <Logo name='pixabay' url='https://pixabay.com/'>
+          <PixabayLogo max-width='300' />
+        </Logo>
+      ) : (
         <ImageGallery images={images} />
-
-        {status === Status.PENDING && <Loader />}
-        {status === Status.RESOLVED && <Button onClick={this.handleNextLoad} />}
-        {status === Status.REJECTED && (
-          <Notification
-            message={message}
-            onClick={() => this.setState({ status: Status.IDLE })}
-          />
-        )}
-        {!images.length && (
-          <Logo name='pixabay' url='https://pixabay.com/'>
-            <PixabayLogo max-width='300' />
-          </Logo>
-        )}
-      </div>
-    );
-  }
+      )}
+      {status === Status.PENDING && <Loader />}
+      {status === Status.RESOLVED && <Button onClick={handleNextLoad} />}
+      {status === Status.REJECTED && (
+        <Notification
+          message={message}
+          onClick={() => setStatus(Status.IDLE)}
+        />
+      )}
+    </div>
+  );
 }
 
 export default App;

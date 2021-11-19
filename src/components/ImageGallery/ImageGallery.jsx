@@ -1,90 +1,61 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ImageGalleryItem } from 'components/ImageGalleryItem';
 import { Modal } from 'components/Modal';
 import s from './ImageGallery.module.css';
 
-class ImageGallery extends Component {
-  static propTypes = {
-    images: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        largeImageURL: PropTypes.string.isRequired,
-      }).isRequired,
-    ).isRequired,
+function ImageGallery({ images }) {
+  const [imageIdx, setImageIdx] = useState(NaN);
+
+  const closeModal = () => {
+    setImageIdx(NaN);
   };
 
-  state = {
-    imageIdx: null,
-    showModal: false,
+  const setNextImage = () => {
+    setImageIdx(idx => (idx + 1 < images.length ? idx + 1 : 0));
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (
-      nextProps.images !== this.props.images ||
-      nextState.imageIdx !== this.state.imageIdx ||
-      nextState.showModal !== this.state.showModal
-    );
-  }
-
-  handleClick = imageIdx => {
-    this.setState({ imageIdx, showModal: true });
+  const setPrevImage = () => {
+    setImageIdx(idx => (idx - 1 >= 0 ? idx - 1 : images.length - 1));
   };
 
-  closeModal = () => {
-    this.setState({ showModal: false });
-  };
+  return (
+    <>
+      <ul className={s.gallery}>
+        {images.map(({ id, webformatURL, tags }, imageIdx) => (
+          <ImageGalleryItem
+            key={id}
+            webformatURL={webformatURL}
+            tags={tags}
+            onClick={() => setImageIdx(imageIdx)}
+          />
+        ))}
+      </ul>
 
-  setNextImage = () => {
-    this.setState(({ imageIdx }) => {
-      const nextIdx = imageIdx + 1;
-      const imagesCount = this.props.images.length;
-
-      return { imageIdx: nextIdx < imagesCount ? nextIdx : 0 };
-    });
-  };
-
-  setPrevImage = () => {
-    this.setState(({ imageIdx }) => {
-      const nextIdx = imageIdx - 1;
-      const imagesCount = this.props.images.length;
-
-      return { imageIdx: nextIdx >= 0 ? nextIdx : imagesCount - 1 };
-    });
-  };
-
-  render() {
-    const { images } = this.props;
-    const { imageIdx, showModal } = this.state;
-
-    return (
-      <>
-        <ul className={s.ImageGallery}>
-          {images.map(({ id, webformatURL, tags }, imageIdx) => (
-            <ImageGalleryItem
-              key={id}
-              webformatURL={webformatURL}
-              tags={tags}
-              onClick={() => this.handleClick(imageIdx)}
-            />
-          ))}
-        </ul>
-
-        {showModal && (
-          <Modal
-            closeModal={this.closeModal}
-            setNextImage={this.setNextImage}
-            setPrevImage={this.setPrevImage}
-          >
-            <img
-              src={images[imageIdx].largeImageURL}
-              alt={images[imageIdx].tags}
-            />
-          </Modal>
-        )}
-      </>
-    );
-  }
+      {!isNaN(imageIdx) && (
+        <Modal
+          closeModal={closeModal}
+          setNextImage={setNextImage}
+          setPrevImage={setPrevImage}
+        >
+          <img
+            src={images[imageIdx].largeImageURL}
+            alt={images[imageIdx].tags}
+          />
+        </Modal>
+      )}
+    </>
+  );
 }
+
+ImageGallery.propTypes = {
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+      tags: PropTypes.string,
+    }).isRequired,
+  ).isRequired,
+};
 
 export { ImageGallery };

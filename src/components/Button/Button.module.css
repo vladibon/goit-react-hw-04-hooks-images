@@ -1,4 +1,4 @@
-.Button {
+.button {
   position: absolute;
   bottom: 20px;
   left: 50%;
@@ -22,7 +22,7 @@
   box-shadow: var(--shadow);
 }
 
-.Button:hover,
-.Button:focus {
+.button:hover,
+.button:focus {
   background-color: var(--accent-hover-bg-color);
 }

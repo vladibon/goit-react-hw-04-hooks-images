@@ -1,47 +1,43 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
-class Modal extends Component {
-  static propTypes = {
-    closeModal: PropTypes.func.isRequired,
-    setNextImage: PropTypes.func.isRequired,
-    setPrevImage: PropTypes.func.isRequired,
-  };
+function Modal({ closeModal, setNextImage, setPrevImage, children }) {
+  useEffect(() => {
+    const handleKeyDown = ({ code }) => {
+      code === 'Escape' && closeModal();
+      code === 'ArrowRight' && setNextImage();
+      code === 'ArrowLeft' && setPrevImage();
+    };
 
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-    document.body.style.overflow = 'unset';
-  }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [closeModal, setNextImage, setPrevImage]);
 
-  handleKeyDown = ({ code }) => {
-    code === 'Escape' && this.props.closeModal();
-    code === 'ArrowRight' && this.props.setNextImage();
-    code === 'ArrowLeft' && this.props.setPrevImage();
+  const handleOverlayClick = ({ currentTarget, target }) => {
+    currentTarget === target && closeModal();
   };
 
-  handleOverlayClick = ({ currentTarget, target }) => {
-    currentTarget === target && this.props.closeModal();
-  };
-
-  render() {
-    const { children } = this.props;
-
-    return createPortal(
-      <div className={s.Overlay} onClick={this.handleOverlayClick}>
-        <div className={s.Modal}>{children}</div>
-      </div>,
-      modalRoot,
-    );
-  }
+  return createPortal(
+    <div className={s.overlay} onClick={handleOverlayClick}>
+      <div className={s.modal}>{children}</div>
+    </div>,
+    modalRoot,
+  );
 }
+
+Modal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  setNextImage: PropTypes.func.isRequired,
+  setPrevImage: PropTypes.func.isRequired,
+};
 
 export { Modal };
