@@ -35,6 +35,13 @@ function App() {
     }
   };
 
+  const scrollTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   const scrollBottom = () => {
     window.scrollTo({
       top: window.innerHeight + window.scrollY - 150,
@@ -43,43 +50,33 @@ function App() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (!query) return;
+
+    loadImages();
+
+    async function loadImages() {
       setStatus(Status.PENDING);
 
       try {
         const { totalHits, hits } = await fetchImages(query, page);
 
-        page === 1
-          ? setImages(hits)
-          : setImages(images => [...images, ...hits]);
-
         checkErrors(totalHits, hits);
+        setImages(images => [...images, ...hits]);
         setStatus(Status.RESOLVED);
-
-        if (page > 1) scrollBottom();
+        page !== 1 && scrollBottom();
       } catch ({ message }) {
         setMessage(message);
         setStatus(Status.REJECTED);
       }
-    };
-
-    if (!query) return;
-
-    fetchData();
+    }
   }, [query, page]);
-
-  const scrollTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
 
   const handleSubmit = newQuery => {
     if (newQuery === query) return scrollTop();
 
     setQuery(newQuery);
     setPage(1);
+    setImages([]);
   };
 
   const handleNextLoad = () => {
