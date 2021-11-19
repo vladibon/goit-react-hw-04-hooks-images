@@ -79,10 +79,6 @@ function App() {
     setImages([]);
   };
 
-  const handleNextLoad = () => {
-    setPage(page => page + 1);
-  };
-
   return (
     <div className={s.App}>
       <Searchbar onSubmit={handleSubmit} />
@@ -95,7 +91,9 @@ function App() {
         <ImageGallery images={images} />
       )}
       {status === Status.PENDING && <Loader />}
-      {status === Status.RESOLVED && <Button onClick={handleNextLoad} />}
+      {status === Status.RESOLVED && (
+        <Button onClick={() => setPage(page => page + 1)} />
+      )}
       {status === Status.REJECTED && (
         <Notification
           message={message}
